@@ -28,10 +28,7 @@ int main(int argc, char **argv, char **env){
     top->en = 0;
 
     // run simulation for many clock cycles
-    for(i = 0; i < 300; i++){
-        top->rst = (i<2) | (i == 25);  // change rst and on signals during simulation
-        top->en = (i>4);  // change the signal during simulation
-
+    for(i = 0; i < 800; i++){
         if(top->count == 0x9){
             top->en = stopping_cycles >= 3;
             stopping_cycles++;
@@ -42,7 +39,13 @@ int main(int argc, char **argv, char **env){
         vbdHex(3, (int(top->count) >> 8)  & 0xF);
         vbdHex(2, (int(top->count) >> 4)  & 0xF);
         vbdHex(1, int(top->count) & 0xF);
+        //vbdPlot(int(top->count), 0, 255);
         vbdCycle(i+1);
+
+        // change input stimuli
+        top->rst = (i<2) | (i == 25);  // change rst and on signals during simulation
+        top->en = vbdFlag();
+        if (Verilated::gotFinish()) exit(0);
 
         /*
             This for-loop toggles the clock and outputs the trace for each 
